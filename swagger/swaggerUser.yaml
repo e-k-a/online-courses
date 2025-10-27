@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: API online school (User service)
+  version: '1.0'
+servers:
+  - url: https://api.online.school/v1/user
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [student, professor, admin]
+        fullName:
+          type: string
+          pattern: '^[А-Яа-яA-Za-z\s-]+$'
+
+    RegisterRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          pattern: '^[А-Яа-яA-Za-z\s-]+$'
+        role:
+          type: string
+          enum: [student, professor, admin]
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: auth
+    description: Авторизация
+  - name: profile
+    description: Профиль
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Регистрация
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: Доступ запрещен
+
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Выполнен вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Пользователь не найден
+
+  /auth/logout:
+    post:
+      summary: Выход пользователя
+      tags:
+        - auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Успешный выход
+        '401':
+          description: Неавторизован
+
+  /profile/me:
+    get:
+      summary: Информация о текущем пользователе
+      tags:
+        - profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Профиль получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'

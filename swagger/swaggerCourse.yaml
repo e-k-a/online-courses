@@ -1,0 +1,251 @@
+openapi: 3.0.3
+info:
+  title: API online school (Course service)
+  version: '1.0'
+servers:
+  - url: https://api.online.school/v1/course
+
+components:
+  schemas:
+    courseRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    courseResponse:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+
+    lessonRequest:
+      type: object
+      required:
+        - courseId
+        - title
+      properties:
+        courseId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+
+    lessonResponse:
+      type: object
+      required:
+        - id
+        - courseId
+        - title
+      properties:
+        id:
+          type: string
+        courseId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: course
+    description: Курсы
+  - name: lesson
+    description: Уроки
+
+paths:
+  /courses:
+    get:
+      summary: Список всех курсов
+      tags:
+        - course
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/courseResponse'
+        '404':
+          description: Нет материалов
+    post:
+      summary: Создать новый курс
+      tags:
+        - course
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/courseRequest'
+      responses:
+        '200':
+          description: Курс создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courseResponse'
+        '403':
+          description: Доступ запрещен
+    delete:
+      summary: Удалить курс
+      tags:
+        - course
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Курс успешно удалён
+        '403':
+          description: Нет прав на удаление курса
+        '404':
+          description: Курс не найден
+
+  /{courseId}:
+    get:
+      summary: Получить информацию о курсе
+      tags:
+        - course
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о курсе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/courseResponse'
+        '404':
+          description: Курс не найден
+
+  /lessons:
+    get:
+      summary: Список всех уроков
+      tags:
+        - lesson
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/lessonResponse'
+        '404':
+          description: Нет материалов
+    post:
+      summary: Создать новый урок
+      tags:
+        - lesson
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/lessonRequest'
+      responses:
+        '200':
+          description: Урок создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lessonResponse'
+        '403':
+          description: Доступ запрещен
+    delete:
+      summary: Удалить урок
+      tags:
+        - lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Урок успешно удалён
+        '403':
+          description: Нет прав на удаление урока
+        '404':
+          description: Урок не найден
+
+  /{courseId}/{lessonId}:
+    get:
+      summary: Получить информацию об уроке
+      tags:
+        - lesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация об уроке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lessonResponse'
+        '404':
+          description: Урок не найден
