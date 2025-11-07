@@ -2,8 +2,13 @@ openapi: 3.0.3
 info:
   title: API online school (User service)
   version: '1.0'
+  license: 
+      name: MIT
+      url: https://opensource.org/licenses/MIT
 servers:
   - url: https://api.online.school/v1/user
+
+
 
 components:
   schemas:
@@ -17,25 +22,28 @@ components:
         role:
           type: string
           enum: [student, professor, admin]
-        fullName:
+        fullName: 
           type: string
-          pattern: '^[А-Яа-яA-Za-z\s-]+$'
+          pattern: '^[А-Яа-яA-Za-z\s-]+$' 
 
     RegisterRequest:
       type: object
       properties:
-        fullName:
+        fullName: 
           type: string
-          pattern: '^[А-Яа-яA-Za-z\s-]+$'
+          pattern: '^[A-Z][a-z]+(?:-[A-Z][a-z]+)?\s[A-Z][a-z]+(?:\s[A-Z][a-z]+)?$'
         role:
           type: string
           enum: [student, professor, admin]
         email:
           type: string
           format: email
+          example: "example@gmail.com"
         password:
           type: string
           format: password
+          example: "SequrePassword123"
+
 
     LoginRequest:
       type: object
@@ -43,10 +51,11 @@ components:
       properties:
         email:
           type: string
-          format: email
+          example: student@example.com
         password:
           type: string
           format: password
+          example: "MySecurePass123"
 
   securitySchemes:
     BearerAuth:
@@ -59,14 +68,15 @@ tags:
     description: Авторизация
   - name: profile
     description: Профиль
-
 paths:
   /auth/register:
     post:
       tags:
         - auth
       summary: Регистрация
-      requestBody:
+      operationId: registerUSer
+      security: []
+      requestBody: 
         required: true
         content:
           application/json:
@@ -79,14 +89,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '403':
+        '403': 
           description: Доступ запрещен
 
   /auth/login:
     post:
-      summary: Авторизация пользователя
-      tags:
+      description: Авторизация пользователя
+      tags: 
         - auth
+      summary: Авторизация
+      security: []
+      operationId: login
       requestBody:
         required: true
         content:
@@ -103,26 +116,31 @@ paths:
         '401':
           description: Пользователь не найден
 
+ 
   /auth/logout:
     post:
       summary: Выход пользователя
-      tags:
+      tags: 
         - auth
       security:
         - BearerAuth: []
+      operationId: logoutUser
       responses:
-        '200':
+        '204':
           description: Успешный выход
         '401':
-          description: Неавторизован
+          description: Пользователь не авторизован 
+        '404':
+          description: Пользователь не найден
 
   /profile/me:
     get:
-      summary: Информация о текущем пользователе
+      summary: 'Информация о текущем пользователе'
       tags:
         - profile
       security:
         - BearerAuth: []
+      operationId: getMyProfile
       responses:
         '200':
           description: Профиль получен
@@ -130,3 +148,5 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '403':
+          description: 'Доступ запрещен'

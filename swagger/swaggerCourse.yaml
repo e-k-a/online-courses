@@ -2,6 +2,9 @@ openapi: 3.0.3
 info:
   title: API online school (Course service)
   version: '1.0'
+  license: 
+      name: MIT
+      url: https://opensource.org/licenses/MIT
 servers:
   - url: https://api.online.school/v1/course
 
@@ -81,6 +84,7 @@ paths:
       summary: Список всех курсов
       tags:
         - course
+      operationId: getCourses
       security:
         - BearerAuth: []
       responses:
@@ -98,6 +102,7 @@ paths:
       summary: Создать новый курс
       tags:
         - course
+      operationId: postCourse
       security:
         - BearerAuth: []
       requestBody:
@@ -107,7 +112,7 @@ paths:
             schema:
               $ref: '#/components/schemas/courseRequest'
       responses:
-        '200':
+        '201':
           description: Курс создан
           content:
             application/json:
@@ -115,31 +120,14 @@ paths:
                 $ref: '#/components/schemas/courseResponse'
         '403':
           description: Доступ запрещен
-    delete:
-      summary: Удалить курс
-      tags:
-        - course
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: courseId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Курс успешно удалён
-        '403':
-          description: Нет прав на удаление курса
-        '404':
-          description: Курс не найден
+    
 
   /{courseId}:
     get:
       summary: Получить информацию о курсе
       tags:
         - course
+      operationId: getCourse
       security:
         - BearerAuth: []
       parameters:
@@ -157,12 +145,32 @@ paths:
                 $ref: '#/components/schemas/courseResponse'
         '404':
           description: Курс не найден
-
+    delete:
+      summary: Удалить курс
+      tags:
+        - course
+      operationId: deleteCourse
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Курс успешно удалён
+        '403':
+          description: Нет прав на удаление курса
+        '404':
+          description: Курс не найден
   /lessons:
     get:
       summary: Список всех уроков
       tags:
         - lesson
+      operationId: getLessons
       security:
         - BearerAuth: []
       responses:
@@ -180,6 +188,7 @@ paths:
       summary: Создать новый урок
       tags:
         - lesson
+      operationId: postLessons
       security:
         - BearerAuth: []
       requestBody:
@@ -189,7 +198,7 @@ paths:
             schema:
               $ref: '#/components/schemas/lessonRequest'
       responses:
-        '200':
+        '201':
           description: Урок создан
           content:
             application/json:
@@ -197,36 +206,14 @@ paths:
                 $ref: '#/components/schemas/lessonResponse'
         '403':
           description: Доступ запрещен
-    delete:
-      summary: Удалить урок
-      tags:
-        - lesson
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: courseId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: lessonId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Урок успешно удалён
-        '403':
-          description: Нет прав на удаление урока
-        '404':
-          description: Урок не найден
+
 
   /{courseId}/{lessonId}:
     get:
       summary: Получить информацию об уроке
       tags:
         - lesson
+      operationId: getLesson
       security:
         - BearerAuth: []
       parameters:
@@ -247,5 +234,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/lessonResponse'
+        '404':
+          description: Урок не найден
+
+    delete:
+      summary: Удалить урок
+      tags:
+        - lesson
+      operationId: deleteLesson
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Урок успешно удалён
+        '403':
+          description: Нет прав на удаление урока
         '404':
           description: Урок не найден

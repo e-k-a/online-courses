@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: API online school (Course service)
+  version: '1.0'
+  license: 
+      name: MIT
+      url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.online.school/v1/analitics
+
+components:
+  schemas:
+    analyticsRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    analyticsResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        remarks:
+          type: array
+          items:
+            type: integer
+
+    certificateRequest:
+      type: object
+      required:
+        - courseId
+      properties:
+        courseId:
+          type: string
+
+    certificateResponse:
+      type: object
+      required:
+        - courseId
+      properties:
+        courseId:
+          type: string
+        certificate:
+          type: string
+          format: binary
+
+    certificatesResponse:
+      type: object
+      required:
+        - courseId
+      properties:
+        courseId:
+          type: string
+        certificate:
+          type: string
+        
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+  - name: analytics
+    description: Оценки студента
+  - name: certificate
+    description: Сертификат о прохождении курса
+
+paths:
+  /certificates:
+    get:
+      summary: Список всех сертификатов
+      tags:
+        - certificate
+      operationId: getCertificates
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/certificatesResponse'
+        '404':
+          description: Нет материалов
+    post:
+      summary: Сгенерировать новый сертификат
+      tags:
+        - certificate
+      operationId: postCertificate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/certificateRequest'
+      responses:
+        '201':
+          description: Сертификат создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/certificateResponse'
+        '403':
+          description: Доступ запрещен
+    
+
+  /certificates/{certificateId}:
+    get:
+      summary: Получить информацию о сертификате
+      tags:
+        - certificate
+      operationId: getCertificate
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: certificateId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о сертификате
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/certificateResponse'
+        '404':
+          description: Сертификат не найден
+    
+  /analytics/{courseId}:
+    get:
+      summary: Получить аналитику по курсу
+      tags:
+        - analytics
+      operationId: getAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о сертификате
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/analyticsResponse'
+        '404':
+          description: Курс не найден
